@@ -259,3 +259,8 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/.vs/NSBDemo/v15
+/NSBDemo.SagaStructure/bin/Debug/netcoreapp2.0
+/NSBDemo.SagaStructure/obj
+/NSBDemo.SagaStructure
+/.vs/NSBDemo/v15
