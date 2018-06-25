@@ -28,6 +28,8 @@ namespace NSBDemo.SagaStructure.Sagas
                     await context.SendLocal(Data.CreatePreparation()).ConfigureAwait(false);
                     break;
             }
+
+            await TryFinalizeSaga().ConfigureAwait(false);
         }
 
         // STEP 2
@@ -37,12 +39,13 @@ namespace NSBDemo.SagaStructure.Sagas
             switch (Data.State)
             {
                 case AwesomeProcessDataStates.Processing:
+                    // Event notification?
+                    await context.Publish(Data.CreatePreparationEvent()).ConfigureAwait(false);
                     await context.SendLocal(Data.CreateExecution()).ConfigureAwait(false);
                     break;
-                case AwesomeProcessDataStates.Failed:
-                    await HandleSagaFinalization(context).ConfigureAwait(false);
-                    break;
             }
+
+            await TryFinalizeSaga().ConfigureAwait(false);
         }
 
         // STEP 3
@@ -52,16 +55,30 @@ namespace NSBDemo.SagaStructure.Sagas
             switch (Data.State)
             {
                 case AwesomeProcessDataStates.Failed:
+                    // DO SOMETHING!
+                    break;
                 case AwesomeProcessDataStates.Done:
-                    await HandleSagaFinalization(context).ConfigureAwait(false);
+                    // Event notification?
+                    await context.Publish(Data.CreateProcessingEvent()).ConfigureAwait(false);
                     break;
             }
+
+            await TryFinalizeSaga().ConfigureAwait(false);
         }
 
-        private async Task HandleSagaFinalization(IMessageHandlerContext context)
+        private Task TryFinalizeSaga()
         {
-            await context.Publish(Data.CreateCompletionEvent()).ConfigureAwait(false);
-            MarkAsComplete();
+            switch (Data.State)
+            {
+                case AwesomeProcessDataStates.Failed:
+                case AwesomeProcessDataStates.Done:
+                    MarkAsComplete();
+                    break;
+                default:
+                    break;
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

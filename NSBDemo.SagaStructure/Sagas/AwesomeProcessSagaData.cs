@@ -14,6 +14,7 @@ namespace NSBDemo.SagaStructure.Sagas
     {
         public Guid ItemId { get; set; }
         public Guid PreparationId { get; set; }
+        public Guid ResultId { get; set; }
         public string Message { get; set; }
 
         public AwesomeProcessDataStates State { get; set; }
@@ -62,17 +63,21 @@ namespace NSBDemo.SagaStructure.Sagas
             ItemId = ItemId
         };
 
-        public ExecuteProcessing CreateExecution() => new ExecuteProcessing
+        internal PreparationCompletedEvent CreatePreparationEvent() => new PreparationCompletedEvent
         {
             ItemId = ItemId,
             PreparationId = PreparationId
         };
 
-        public ProcessingCompletedEvent CreateCompletionEvent() => new ProcessingCompletedEvent
+        public ExecuteProcessing CreateExecution() => new ExecuteProcessing
+        {
+            PreparationId = PreparationId
+        };
+
+        public ProcessingCompletedEvent CreateProcessingEvent() => new ProcessingCompletedEvent
         {
             ItemId = ItemId,
-            Success = State == AwesomeProcessDataStates.Done,
-            Message = Message
+            ResultId = ResultId
         };
 
         private void VerifyDataChange(AwesomeProcessDataStates allowedState, [CallerMemberName]string callerName = null)

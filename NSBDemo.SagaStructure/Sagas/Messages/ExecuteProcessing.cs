@@ -8,14 +8,14 @@ namespace NSBDemo.SagaStructure.Sagas.Messages
     {
         public class Response
         {
+            public Guid ResultId { get; set; }
             public bool Success { get; set; }
             public string Message { get; set; }
         }
 
-        public Guid ItemId { get; set; }
         public Guid PreparationId { get; set; }
 
-        public Response CreateSuccess() => new Response { Success = true };
+        public Response CreateSuccess(Guid resultId) => new Response { ResultId = resultId, Success = true };
 
         public Response CreateFailure(string message) => new Response { Message = message };
     }
